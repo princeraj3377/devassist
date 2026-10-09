@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "devassist"
+version = "0.1.0"
+description = "Auditable AI-assisted GitHub pull request reviews"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115,<1", "uvicorn[standard]>=0.30,<1",
+  "pydantic>=2.9,<3", "pydantic-settings>=2.5,<3",
+  "sqlalchemy[asyncio]>=2.0,<2.1", "asyncpg>=0.29,<1",
+  "alembic>=1.13,<2", "redis>=5,<6", "arq>=0.26,<0.27",
+  "httpx>=0.27,<1", "ruff>=0.9,<1", "bandit>=1.7,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9", "pytest-asyncio>=0.24,<1", "pytest-cov>=6,<7",
+  "respx>=0.21,<1", "fakeredis>=2.25,<3", "mypy>=1.13,<2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["app", "alembic"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = "--cov=app/api --cov=app/services --cov-report=term-missing --cov-fail-under=80"
+markers = ["integration: requires live PostgreSQL and Redis"]
